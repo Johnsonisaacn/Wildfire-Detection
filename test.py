@@ -27,13 +27,11 @@ def test_email_system():
     print("2. Sending test alert...")
     success = email_system.send_alert(
         confidence=0.85,
-        image_path=None,  # No image for test
         additional_info="This is a test alert from the wildfire detection system."
     )
     
     if success:
         print("   ✅ Test alert sent successfully!")
-        print("   Check your email inbox for the test message.")
     else:
         print("   ❌ Failed to send test alert.")
 

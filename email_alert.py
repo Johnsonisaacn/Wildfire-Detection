@@ -1,20 +1,17 @@
+# email_alert_fixed.py
 import smtplib
 import logging
 from email.mime.multipart import MimeMultipart
 from email.mime.text import MimeText
 from email.mime.image import MimeImage
-from email.mime.application import MimeApplication
 import os
 from datetime import datetime, timedelta
-import json
+import importlib.util
 
 class EmailAlertSystem:
     def __init__(self, config_path='email_config.py'):
         """
         Initialize email alert system with configuration
-        
-        Args:
-            config_path: Path to email configuration file
         """
         self.load_config(config_path)
         self.last_alert_time = None
@@ -24,7 +21,6 @@ class EmailAlertSystem:
         """Load email configuration from file"""
         try:
             # Import the config module
-            import importlib.util
             spec = importlib.util.spec_from_file_location("email_config", config_path)
             config_module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(config_module)
@@ -74,52 +70,19 @@ class EmailAlertSystem:
     def create_email_content(self, confidence, image_path=None):
         """Create HTML email with alert information"""
         
-        # HTML template for the email
         html_content = f"""
-        <!DOCTYPE html>
         <html>
-        <head>
-            <style>
-                body {{ font-family: Arial, sans-serif; margin: 20px; }}
-                .alert {{ background-color: #ffebee; border-left: 4px solid #f44336; padding: 15px; }}
-                .confidence {{ color: #d32f2f; font-weight: bold; font-size: 18px; }}
-                .info {{ background-color: #e3f2fd; padding: 10px; border-radius: 5px; }}
-                .contacts {{ background-color: #fff3e0; padding: 10px; border-radius: 5px; margin-top: 15px; }}
-            </style>
-        </head>
         <body>
-            <div class="alert">
-                <h2>🚨 WILDFIRE DETECTION ALERT</h2>
-                <p class="confidence">Detection Confidence: {confidence:.1%}</p>
-            </div>
+            <h2>🚨 WILDFIRE DETECTION ALERT</h2>
+            <p><strong>Detection Confidence:</strong> {confidence:.1%}</p>
+            <p><strong>Location:</strong> {self.config['location']}</p>
+            <p><strong>Time:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</p>
             
-            <div class="info">
-                <h3>Alert Details:</h3>
-                <ul>
-                    <li><strong>Location:</strong> {self.config['location']}</li>
-                    <li><strong>Time:</strong> {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}</li>
-                    <li><strong>System:</strong> Raspberry Pi Wildfire Detection</li>
-                </ul>
-            </div>
-            
-            <div class="contacts">
-                <h3>🚒 Emergency Contacts:</h3>
-                <p>{self.config['emergency_contacts']}</p>
-            </div>
-            
-            <div>
-                <h3>📋 Required Actions:</h3>
-                <ol>
-                    <li>Verify the attached image</li>
-                    <li>Contact local authorities if confirmed</li>
-                    <li>Check for additional alerts from the system</li>
-                    <li>Monitor the situation closely</li>
-                </ol>
-            </div>
+            <h3>Emergency Contacts:</h3>
+            <p>{self.config['emergency_contacts']}</p>
             
             <hr>
-            <p><em>This is an automated alert from the Wildfire Detection System. 
-            Please verify all information before taking action.</em></p>
+            <p><em>Automated alert from Wildfire Detection System</em></p>
         </body>
         </html>
         """
@@ -129,30 +92,21 @@ class EmailAlertSystem:
     def send_alert(self, confidence, image_path=None, additional_info=None):
         """
         Send wildfire alert email
-        
-        Args:
-            confidence: Detection confidence (0.0 to 1.0)
-            image_path: Path to the alert image
-            additional_info: Any additional information about the detection
         """
-        
         # Check cooldown period
         if self.is_cooldown_active():
             self.logger.info("Alert suppressed - cooldown period active")
             return False
         
         try:
-            # Create message container
+            # Create message container - FIXED IMPORTS
             msg = MimeMultipart()
-            msg['Subject'] = f"{self.config['subject_prefix']}Confidence: {confidence:.1%} - {self.config['location']}"
+            msg['Subject'] = f"{self.config['subject_prefix']}Confidence: {confidence:.1%}"
             msg['From'] = self.config['email_from']
             msg['To'] = ', '.join(self.config['email_to'])
             
             # Create HTML body
             html_body = self.create_email_content(confidence, image_path)
-            if additional_info:
-                html_body += f"<p><strong>Additional Info:</strong> {additional_info}</p>"
-            
             msg.attach(MimeText(html_body, 'html'))
             
             # Attach image if provided
@@ -168,7 +122,7 @@ class EmailAlertSystem:
             
             # Update last alert time
             self.last_alert_time = datetime.now()
-            self.logger.info(f"Email alert sent successfully to {len(self.config['email_to'])} recipients")
+            self.logger.info(f"Email alert sent successfully")
             return True
             
         except Exception as e:
@@ -178,27 +132,14 @@ class EmailAlertSystem:
     def _send_email(self, msg):
         """Internal method to handle SMTP connection and sending"""
         try:
-            # Connect to SMTP server
             server = smtplib.SMTP(self.config['smtp_server'], self.config['smtp_port'])
             server.starttls()
-            
-            # Login to email account
             server.login(self.config['email_from'], self.config['email_password'])
-            
-            # Send email
             server.send_message(msg)
-            
-            # Close connection
             server.quit()
             
-        except smtplib.SMTPAuthenticationError:
-            self.logger.error("SMTP Authentication failed. Check your email and password.")
-            raise
-        except smtplib.SMTPException as e:
-            self.logger.error(f"SMTP error occurred: {e}")
-            raise
         except Exception as e:
-            self.logger.error(f"Unexpected error sending email: {e}")
+            self.logger.error(f"Error sending email: {e}")
             raise
     
     def test_connection(self):
@@ -214,41 +155,23 @@ class EmailAlertSystem:
             self.logger.error(f"Email connection test: FAILED - {e}")
             return False
 
-# Utility function to create config file
 def create_email_config_template():
     """Create a template email configuration file"""
     template = '''# email_config.py
-"""
-Email configuration for wildfire alerts
-Fill in your actual email credentials
-"""
-
 EMAIL_CONFIG = {
-    # SMTP Server Settings
-    'smtp_server': 'smtp.gmail.com',  # For Gmail. For Outlook: 'smtp-mail.outlook.com'
+    'smtp_server': 'smtp.gmail.com',
     'smtp_port': 587,
-    
-    # Email Account Credentials
-    'email_from': 'your.email@gmail.com',  # Your sending email address
-    'email_password': 'your_app_password',  # Use App Password for Gmail
-    
-    # Recipients (comma-separated list)
+    'email_from': 'luna.devcorp.8@gmail.com',
+    'email_password': 'Lun@Th3Cat',
     'email_to': [
-        'recipient1@email.com',
-        'recipient2@email.com'
+        'johnsoi4@oregonstate.edu'
     ],
-    
-    # Alert Settings
     'location': 'Remote Outpost Alpha',
     'cooldown_minutes': 5,
-    
-    # Email Content
     'subject_prefix': '🔥 WILDFIRE ALERT - ',
-    'emergency_contacts': 'Forest Service: 1-800-123-4567, Local Ranger: 1-800-987-6543'
+    'emergency_contacts': 'Forest Service: 1-800-123-4567'
 }
 '''
-    
     with open('email_config.py', 'w') as f:
         f.write(template)
-    
-    print("Email config template created. Please edit 'email_config.py' with your credentials.")
+    print("Email config template created.")
