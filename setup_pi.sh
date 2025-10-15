@@ -55,4 +55,4 @@ chmod 600 email_config.py
 echo "Email configuration file permissions secured"
 echo "✅ Setup complete!"
 
-echo "To run the detector: python3 wildfire_detector_with_email.py"
+echo "To run the detector: python3 wildfire_detector.py"
