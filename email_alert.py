@@ -155,23 +155,3 @@ class EmailAlertSystem:
             self.logger.error(f"Email connection test: FAILED - {e}")
             return False
 
-def create_email_config_template():
-    """Create a template email configuration file"""
-    template = '''# email_config.py
-EMAIL_CONFIG = {
-    'smtp_server': 'smtp.gmail.com',
-    'smtp_port': 587,
-    'email_from': 'luna.devcorp.8@gmail.com',
-    'email_password': 'pewi iexk xtvo yebd',
-    'email_to': [
-        'johnsoi4@oregonstate.edu'
-    ],
-    'location': 'Remote Outpost Alpha',
-    'cooldown_minutes': 5,
-    'subject_prefix': '🔥 WILDFIRE ALERT - ',
-    'emergency_contacts': 'Forest Service: 1-800-123-4567'
-}
-'''
-    with open('email_config.py', 'w') as f:
-        f.write(template)
-    print("Email config template created.")
