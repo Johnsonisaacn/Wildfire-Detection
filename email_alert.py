@@ -8,12 +8,12 @@ from datetime import datetime, timedelta
 import importlib.util
 
 logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-            handlers=[
-                logging.FileHandler('email_alerts.log'),
-                logging.StreamHandler()
-            ]
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('email_alerts.log'),
+        logging.StreamHandler()
+        ]
         )
 
 class EmailAlertSystem:
