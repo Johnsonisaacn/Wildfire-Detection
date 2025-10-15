@@ -1,4 +1,3 @@
-# model_loader.py
 import torch
 import torch.nn as nn
 from torchvision import models
@@ -60,17 +59,3 @@ class WildfireModelLoader:
         except Exception as e:
             self.logger.error(f"Error loading model: {e}")
             raise
-
-# Test the model loading
-def test_model_loading():
-    loader = WildfireModelLoader()
-    try:
-        model, config = loader.load_model('wildfire_detector_optimized.pt', 'model_config.json')
-        print("✅ Model loaded successfully!")
-        return True
-    except Exception as e:
-        print(f"❌ Model loading failed: {e}")
-        return False
-
-if __name__ == "__main__":
-    test_model_loading()

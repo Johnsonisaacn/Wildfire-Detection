@@ -1,21 +1,32 @@
-# email_alert_fixed.py
 import smtplib
 import logging
-from email.mime.multipart import MimeMultipart
-from email.mime.text import MimeText
-from email.mime.image import MimeImage
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
 import os
 from datetime import datetime, timedelta
 import importlib.util
+
+logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+            handlers=[
+                logging.FileHandler('email_alerts.log'),
+                logging.StreamHandler()
+            ]
+        )
 
 class EmailAlertSystem:
     def __init__(self, config_path='email_config.py'):
         """
         Initialize email alert system with configuration
         """
+        self.logger = logging.getLogger('EmailAlerts')
+        self.logger.info("EmailAlertSystem initialized")
         self.load_config(config_path)
         self.last_alert_time = None
-        self.setup_logging()
+        
+        
         
     def load_config(self, config_path):
         """Load email configuration from file"""
@@ -47,17 +58,6 @@ class EmailAlertSystem:
             'emergency_contacts': os.getenv('EMERGENCY_CONTACTS', '')
         }
     
-    def setup_logging(self):
-        """Setup logging for email alerts"""
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-            handlers=[
-                logging.FileHandler('email_alerts.log'),
-                logging.StreamHandler()
-            ]
-        )
-        self.logger = logging.getLogger('EmailAlerts')
     
     def is_cooldown_active(self):
         """Check if we're in cooldown period to prevent alert spam"""
@@ -100,21 +100,21 @@ class EmailAlertSystem:
         
         try:
             # Create message container - FIXED IMPORTS
-            msg = MimeMultipart()
+            msg = MIMEMultipart()
             msg['Subject'] = f"{self.config['subject_prefix']}Confidence: {confidence:.1%}"
             msg['From'] = self.config['email_from']
             msg['To'] = ', '.join(self.config['email_to'])
             
             # Create HTML body
             html_body = self.create_email_content(confidence, image_path)
-            msg.attach(MimeText(html_body, 'html'))
+            msg.attach(MIMEText(html_body, 'html'))
             
             # Attach image if provided
             if image_path and os.path.exists(image_path):
                 with open(image_path, 'rb') as img_file:
                     img_data = img_file.read()
                 
-                image_attachment = MimeImage(img_data, name=os.path.basename(image_path))
+                image_attachment = MIMEImage(img_data, name=os.path.basename(image_path))
                 msg.attach(image_attachment)
             
             # Send email
@@ -162,7 +162,7 @@ EMAIL_CONFIG = {
     'smtp_server': 'smtp.gmail.com',
     'smtp_port': 587,
     'email_from': 'luna.devcorp.8@gmail.com',
-    'email_password': 'Lun@Th3Cat',
+    'email_password': 'pewi iexk xtvo yebd',
     'email_to': [
         'johnsoi4@oregonstate.edu'
     ],

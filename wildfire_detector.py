@@ -6,9 +6,8 @@ import time
 import logging
 import os
 from datetime import datetime
-
-# Import our email alert system
-from email_alert import EmailAlertSystem, create_email_config_template
+from model_loader import WildfireModelLoader
+from email_alert import EmailAlertSystem
 
 class WildfireDetector:
     def __init__(self, model_path, config_path, email_config_path='email_config.py'):
@@ -143,15 +142,11 @@ def pi_camera_capture():
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     image_path = f"capture_{timestamp}.jpg"
     image.save(image_path)
+    camera.close()
     
     return image, image_path
 
 if __name__ == "__main__":
-    # First, create config template if it doesn't exist
-    if not os.path.exists('email_config.py'):
-        create_email_config_template()
-        print("Please configure email_config.py first!")
-        exit(1)
     
     # Initialize detector
     detector = WildfireDetector(
