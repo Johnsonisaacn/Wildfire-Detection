@@ -9,15 +9,24 @@ from datetime import datetime
 from model_loader import WildfireModelLoader
 from email_alert import EmailAlertSystem
 
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.FileHandler('wildfire_detection.log'),
+        logging.StreamHandler()
+    ]
+)
+
 class WildfireDetector:
     def __init__(self, model_path, config_path, email_config_path='email_config.py'):
-        # Load model configuration
-        with open(config_path, 'r') as f:
-            self.model_config = json.load(f)
-        
-        # Load the optimized model
-        self.model = torch.jit.load(model_path)
-        self.model.eval()
+        self.logger = logging.getLogger('WildfireDetector')
+        self.logger.info("Initializing WildfireDetector...")
+
+        self.model_loader = WildfireModelLoader()
+        self.model, self.model_config = self.model_loader.load_model(model_path, config_path)
+        self.logger.info("Model loaded successfully")
         
         # Set up image transformations
         self.transform = transforms.Compose([
@@ -29,17 +38,6 @@ class WildfireDetector:
         
         # Initialize email alert system
         self.email_alerts = EmailAlertSystem(email_config_path)
-        
-        # Setup logging
-        logging.basicConfig(
-            level=logging.INFO,
-            format='%(asctime)s - %(levelname)s - %(message)s',
-            handlers=[
-                logging.FileHandler('wildfire_detection.log'),
-                logging.StreamHandler()
-            ]
-        )
-        self.logger = logging.getLogger()
         
         # Test email connection on startup
         self.logger.info("Testing email connection...")
