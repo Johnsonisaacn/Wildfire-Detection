@@ -15,7 +15,7 @@ Monitor
 
 Set up Pi with mouse, keyboard, HDMI to monitor, and camera module as shown in photo (camera should be adjusted with tripod or other support structure)
 
-![image info]./images/r_pi_setup.jpg
+![screenshot](images/r_pi_setup.jpg)
 ## Software Setup
 
 Set up Raspberry Pi OS on Pi as per official instructions. Ensure Pi is connected to internet and git is installed
@@ -44,6 +44,6 @@ El-Madafri I, Peña M, Olmedo-Torre N. The Wildfire Dataset: Enhancing Deep Lear
 
 The training program is found on the Jupyter Notebook in the repo and trained on Kaggle using GPU T4 x 2 for 4 epochs. Model evaluation data shown in these two figures:
 
-![image info]./images/training.png
+![screenshot](images/training.png)
 
-![imag info]./images/classification_report.png
+![screenshot](images/classification_report.png)
