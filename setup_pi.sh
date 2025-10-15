@@ -54,8 +54,5 @@ echo "6. Setting file permissions..."
 chmod 600 email_config.py
 echo "Email configuration file permissions secured"
 echo "✅ Setup complete!"
-<<<<<<< HEAD
-echo "To run the detector: python3 wildfire_detector_with_email.py"                                                             
-=======
+
 echo "To run the detector: python3 wildfire_detector_with_email.py"
->>>>>>> ec60da3 (edited setup)

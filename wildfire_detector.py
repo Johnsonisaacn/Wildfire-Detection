@@ -150,7 +150,7 @@ if __name__ == "__main__":
     
     # Initialize detector
     detector = WildfireDetector(
-        model_path="wildfire_detector_optimized.pt",
+        model_path=".best_wildfire_model.pth",
         config_path="model_config.json",
         email_config_path="email_config.py"
     )
