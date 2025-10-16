@@ -32,7 +32,9 @@ After successful setup, run the program with the following command
 
 ```python3 wildfire_detector.py``` 
 
-The program will run and take a photo every 30 seconds, sending an alert email if the confidence level is above the threshold. If the program sends an alert email, it will trigger a cool down period of 5 minutes between email alerts to prevent the recipient email adress spam control from kicking in.
+The program will run and take a photo every 30 seconds, sending an alert email if the confidence level is above the threshold. If the program sends an alert email, it will trigger a cool down period of 5 minutes between email alerts to prevent the recipient email adress spam control from kicking in. The email alert includes the photo that triggered the alert, as seen in the example below:
+
+![screenshot](images/alert.png)
 
 
 
